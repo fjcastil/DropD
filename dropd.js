@@ -24,7 +24,7 @@
 		}
 	};
 
-	dropdown.changedropdown = function(elem) {
+	dropdown.changeDropdown = function(elem) {
 		var value = $(elem).data('value'),
 			text = $(elem).text(),
 			group = $(elem).parent().data('group');
@@ -119,13 +119,16 @@
 	 * BUILDER FUNCTIONS:
 	 */
 
-	dropdown.getOption = function(option) {
-		var html = $('<p class="dropdown-option focusable" data-value="' + $(option).val() + '" >' + $(option).text() + '</p>')
-			.css({
-				cursor: 'pointer',
-				'margin-top': '2%',
-				'margin-bottom': '2%',
-			});
+	dropdown.getOption = function(option, parentOption) {
+		var classes = $(option).attr('class') || '',
+			html = $('<p class="dropdown-option focusable" data-value="' + $(option).val() + '" >' + $(option).text() + '</p>')
+				.addClass(classes)
+				.addClass(parentOption ? 'group group-collapsed' : '')
+				.css({
+					cursor: 'pointer',
+					'margin-top': '2%',
+					'margin-bottom': '2%',
+				});
 
 		return html[0].outerHTML;
 	};
@@ -133,7 +136,7 @@
 	dropdown.getGroup = function(index, title, options, classes) {
 		var items = '', group = '';
 		$(options).each(function() {
-			items = items + dropdown.getOption(this);
+			items = items + dropdown.getOption(this, false);
 		});
 
 		title = '<h3 class="focusable"><span class="dropdown-icon focusable">' + settings.collapsedIcon + '</span> ' + title + '</h3>';
@@ -162,8 +165,13 @@
 
 	dropdown.getSelect = function(old_dropdown) {
 		var i = 0, html = '';
-		$('optgroup', old_dropdown).each(function() {
-			html = html + dropdown.getGroup(i++, $(this).attr('label'), $(this).children(), $(this).attr('class'));
+
+		$(old_dropdown).children().each(function() {
+			if($(this).is('optgroup')) {
+				html = html + dropdown.getGroup(i++, $(this).attr('label'), $(this).children(), $(this).attr('class'));
+			} else {
+				html = html + dropdown.getOption($(this), true);
+			}
 		});
 
 		var input = $('<input class="dropdown-select focusable" type="text" />');
@@ -220,7 +228,7 @@
 				}
 			})
 			.click(function(event) {
-				if(!$(event.srcElement).hasClass('focusable')) {
+				if(!$(event.target).hasClass('focusable')) {
 					dropdown.hideList();
 				}
 			});
@@ -229,7 +237,7 @@
 			.on('click', '.dropdown-option', function(e) {
 				var oldValue = String($('.dropdown-select').val().trim());
 
-				dropdown.changedropdown(this);
+				dropdown.changeDropdown(this);
 				dropdown.callback(e, settings.onClick, this);
 
 				var newValue = String($(this).text().trim());
@@ -255,7 +263,7 @@
 					dropdown.collapseGroup($(this));
 				});
 			});
-			// .mouseleave(function() {
+			// $('.group').mouseleave(function() {
 			// 	$('.group[data-group!=' + $(this).data('group') + ']').each(function() {
 			// 		dropdown.collapseGroup($(this));
 			// 	});
@@ -264,7 +272,7 @@
 		
 		var selected = $(':selected', hidden).val().trim();
 		$('.dropdown-option[data-value=' + selected + ']').each(function() {
-			dropdown.changedropdown(this);
+			dropdown.changeDropdown(this);
 		});
 	};
 
@@ -289,7 +297,6 @@
 			dropdownIcon: '&#x25BE;', //'<i class="fa fa-caret-down"></i>',
 			expandedIcon: '&#x25BE;', //'<i class="fa fa-caret-down"></i>',
 			collapsedIcon: '&#x25B8;', //'<i class="fa fa-caret-right"></i>',
-			firstOption: undefined,
 			collapseOnHover: true,
 			onClick: undefined,
 			onChange: undefined,
