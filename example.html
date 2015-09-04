@@ -2,20 +2,22 @@
 <head></head>
 <body>
 <select id="myDropD">
+	<option class="class-one class-two" value="0">Select all...</option>
 	<optgroup label="Group A">
 		<option value="1">Option 1 of group A</option>
 		<option value="2">Option 2 of group A</option>
 		<option value="3">Option 3 of group A</option>
 	</optgroup>
+	<option class="class-three" value="4">Random option...</option>
 	<optgroup label="Group B">
-		<option value="4">Option 4 of group B</option>
-		<option value="5">Option 5 of group B</option>
-		<option value="6">Option 6 of group B</option>
+		<option value="5">Option 1 of group B</option>
+		<option value="6">Option 2 of group B</option>
+		<option value="7">Option 3 of group B</option>
 	</optgroup>
 	<optgroup label="Group C">
-		<option value="7">Option 7 of group C</option>
-		<option value="8">Option 8 of group C</option>
-		<option value="9">Option 9 of group C</option>
+		<option value="8">Option 1 of group C</option>
+		<option value="9">Option 2 of group C</option>
+		<option value="10">Option 3 of group C</option>
 	</optgroup>
 </select>
 <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.js"></script>
@@ -27,6 +29,14 @@
 		onClick: function(elem) {
 			console.log(elem);
 		}
+	});
+
+	$(document).ready(function() {
+		$('.class-one').css('text-indent', '15px');
+		$('.class-two').css({
+			'font-weight': 'bold',
+			'font-style': 'italic'
+		});
 	});
 })(window.jQuery, window, window.document);
 </script>
