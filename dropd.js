@@ -1,4 +1,15 @@
-/* ECMAScript 6 */
+/*
+ * DropD jQuery Dropdown v1.0.2
+ * https://github.com/fjcastil/DropD
+ *
+ * Copyright (c) 2015 Frank Castillo
+ * Dual licensed under the MIT and GPL licenses.
+ * http://opensource.org/licenses/MIT
+ * http://opensource.org/licenses/GPL-3.0
+ *
+ * Date: 2015-09-03 17:34:21 -0500 (Thu, 03 Aug 2015)
+ * Revision: 2
+ */
 ;(function($, window, document, undefined) {
 	"use strict";
 
@@ -187,14 +198,15 @@
 		arrow.css({
 			font: settings.font,
 			color: settings.color,
-			position: 'relative',
 			cursor: 'pointer',
-			left: '-15px',
+			position: 'absolute',
+			'z-index': 1,
+			right: 5,
 		});
 
 		var select = $('<span>' + input[0].outerHTML + arrow[0].outerHTML + '</span>')[0].outerHTML;
 
-		html = $('<div><span>' + select + '</span><div class="dropdown-list focusable">' + html + '</div></div>');
+		html = $('<div><span style="position:relative;">' + select + '</span><div class="dropdown-list focusable">' + html + '</div></div>');
 		$('.dropdown-list', html)
 			.hide()
 			.addClass('objHide')
