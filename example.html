@@ -1,34 +1,121 @@
 <html>
-<head></head>
+<head>
+<title>DropD &#9837; - Collapsible Dropdown</title>
+<style type="text/css">
+	#background {
+		background-image: url('https://www.dropbox.com/s/k4tlwk43h8c0l27/dropd.png?raw=1');
+		background-repeat: no-repeat;
+		background-position: center;
+		-moz-opacity: 0.3;
+		opacity:.3;
+		filter: alpha(opacity=30);
+		position: absolute;
+		top:0;
+		left:0;
+		right:0;
+		bottom:0;
+		z-index:0;
+	}
+	#container {
+		position: relative;
+		z-index: 999;
+	}
+	label {
+		display: inline-block;
+	}
+</style>
+</head>
 <body>
-<select id="myDropD">
-	<option class="class-one class-two" value="0">Select all...</option>
-	<optgroup label="Group A">
-		<option value="1">Option 1 of group A</option>
-		<option value="2">Option 2 of group A</option>
-		<option value="3">Option 3 of group A</option>
+<div id="background"></div>
+<div id="container">
+	<label for="oldSelect">
+		<span>Get any ol' dropdown...</span>
+		<select id="oldSelect">
+			<option class="class-one class-two" value="0">Select all...</option>
+			<optgroup label="Group A">
+				<option value="1">Option 1 of group A</option>
+				<option value="2">Option 2 of group A</option>
+				<option value="3">Option 3 of group A</option>
+			</optgroup>
+			<option class="class-three" value="4">Lonely option</option>
+			<optgroup label="Group B">
+				<option value="5">Option 1 of group B</option>
+				<option value="6">Option 2 of group B</option>
+				<option value="7">Option 3 of group B</option>
+			</optgroup>
+			<optgroup label="Group C">
+				<option value="8">Option 1 of group C</option>
+				<option value="9">Option 2 of group C</option>
+				<option value="10">Option 3 of group C</option>
+			</optgroup>
+		</select>
+	</label>
+
+	<label for="myDropD">
+		<span>... and turn into it this:</span>
+		<select id="myDropD">
+			<option class="class-one class-two" value="0">Select all...</option>
+			<optgroup label="Group A">
+				<option value="1">Option 1 of group A</option>
+				<option value="2">Option 2 of group A</option>
+				<option value="3">Option 3 of group A</option>
+			</optgroup>
+			<option class="class-three" value="4">Lonely option.</option>
+			<optgroup label="Group B">
+				<option value="5">Option 1 of group B</option>
+				<option value="6">Option 2 of group B</option>
+				<option value="7">Option 3 of group B</option>
+			</optgroup>
+			<optgroup label="Group C">
+				<option value="8">Option 1 of group C</option>
+				<option value="9">Option 2 of group C</option>
+				<option value="10">Option 3 of group C</option>
+			</optgroup>
+		</select>
+	</label>
+
+<!-- <select id="test">
+	<option class="class-one class-two" value="0">.....................</option>
+	<optgroup label=".....................">
+		<option value="1">.....................</option>
+		<option value="2">.....................</option>
+		<option value="3">.....................</option>
 	</optgroup>
-	<option class="class-three" value="4">Random option...</option>
-	<optgroup label="Group B">
-		<option value="5">Option 1 of group B</option>
-		<option value="6">Option 2 of group B</option>
-		<option value="7">Option 3 of group B</option>
+	<option class="class-three" value="4">.....................</option>
+	<optgroup label=".....................">
+		<option value="5">.....................</option>
+		<option value="6">.....................</option>
+		<option value="7">.....................</option>
 	</optgroup>
-	<optgroup label="Group C">
-		<option value="8">Option 1 of group C</option>
-		<option value="9">Option 2 of group C</option>
-		<option value="10">Option 3 of group C</option>
+	<optgroup label=".....................">
+		<option value="8">.....................</option>
+		<option value="9">.....................</option>
+		<option value="10">.....................</option>
 	</optgroup>
-</select>
+</select> -->
+
+	<br />
+	<label id="onClick"></label>
+	<br />
+	<label id="onChange"></label>
+</div>
+
 <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.js"></script>
 <script type="text/javascript" src="dropd.js"></script>
 <script type="text/ecmascript">
 ;(function($, window, document) {
 	$('#myDropD').dropd({
 		width: '150px',
-		onClick: function(elem) {
-			console.log(elem);
+		onClick: function(id, elem) {
+			$('#onClick').text('onClick() ID: ' + id).show().slideUp(3500);
+		},
+		onChange: function(id, elem) {
+			$('#onChange').text('onChange() ID: ' + id).show().slideUp(3500);
 		}
+	});
+
+	$('#test').dropd({
+		width: '150px'
 	});
 
 	$(document).ready(function() {

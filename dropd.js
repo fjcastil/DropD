@@ -13,8 +13,8 @@
 ;(function($, window, document, undefined) {
 	"use strict";
 
-	var dropdown = {},
-		hidden = {},
+	var dropd = {},
+		current = {},
 		settings = {},
 		keycodes = [];
 
@@ -24,105 +24,102 @@
 	 * ACTION FUNCTIONS:
 	 */
 
-	dropdown.callback = function(event, callback, elem) {
+	dropd.callback = function(event, callback, elem) {
 		if(callback == undefined) {
 			return;
 		}
 
 		if(callback instanceof Function) {
 			event.preventDefault();
-			callback(elem);
+			callback($(elem).data('value'), elem);
 		}
 	};
 
-	dropdown.changeDropdown = function(elem) {
+	dropd.changeDropdown = function(elem) {
 		var value = $(elem).data('value'),
 			text = $(elem).text(),
 			group = $(elem).parent().data('group');
 
-		hidden.val(value);
-		$('#dropdown-hidden-select').empty().append(hidden);
-		$('.dropdown-select').parent().append(hidden);
-		$('.dropdown-select')
+		$('.' + dropd.classSelect)
 			.attr('data-value', value)
 			.attr('data-group', group)
 			.val(text);
 
-		dropdown.hideAllGroups();
-		dropdown.expandGroup($('.group[data-group=' + group + ']'));
+		dropd.hideAllGroups();
+		dropd.expandGroup($('.' + dropd.classGroup + '[data-group=' + group + ']'));
 
-		dropdown.deselectAllOptions('selected');
-		dropdown.selectOption(value, 'selected');
+		dropd.deselectAllOptions('selected');
+		dropd.selectOption(value, 'selected');
 
-		dropdown.hideList();
+		dropd.hideList();
 	};
 
-	dropdown.expandGroup = function(group) {
-		group.addClass('group-expanded').removeClass('group-collapsed');
-		$('.items[data-group=' + group.data('group') + ']').slideDown();
-		$('.dropdown-icon', group).html(settings.expandedIcon);
+	dropd.expandGroup = function(group) {
+		group.addClass(dropd.classGroupExpanded).removeClass(dropd.classGroupCollapsed);
+		$('.' + dropd.classItems + '[data-group=' + group.data('group') + ']').slideDown();
+		$('.' + dropd.classIcon, group).html(settings.expandedIcon);
 	};
 
-	dropdown.collapseGroup = function(group) {
-		group.addClass('group-collapsed').removeClass('group-expanded');
-		$('.items[data-group=' + group.data('group') + ']').slideUp();
-		$('.dropdown-icon', group).html(settings.collapsedIcon);
+	dropd.collapseGroup = function(group) {
+		group.addClass(dropd.classGroupCollapsed).removeClass(dropd.classGroupExpanded);
+		$('.' + dropd.classItems + '[data-group=' + group.data('group') + ']').slideUp();
+		$('.' + dropd.classIcon, group).html(settings.collapsedIcon);
 	};
 
-	dropdown.hideAllGroups = function() {
-		$('.group').each(function() {
-			$(this).addClass('group-collapsed').removeClass('group-expanded');
-			$('.items[data-group=' + $(this).data('group') + ']').hide();
-			$('.dropdown-icon').html(settings.collapsedIcon);
+	dropd.hideAllGroups = function() {
+		$('.' + dropd.classGroup).each(function() {
+			$(this).addClass(dropd.classGroupCollapsed).removeClass(dropd.classGroupExpanded);
+			$('.' + dropd.classItems + '[data-group=' + $(this).data('group') + ']').hide();
+			$('.' + dropd.classIcon).html(settings.collapsedIcon);
 		});
 	};
 
-	dropdown.toggleGroup = function() {
+	dropd.toggleGroup = function() {
 		var group = $(this);
-		if(group.hasClass('group-collapsed')) {
-			dropdown.expandGroup(group);
+		if(group.hasClass(dropd.classGroupCollapsed)) {
+			dropd.expandGroup(group);
 		} else {
-			dropdown.collapseGroup(group);
+			dropd.collapseGroup(group);
 		}
 	};
 
-	dropdown.selectOption = function(value, addClass) {
-		$('.dropdown-option[data-value=' + value + ']')
-		.addClass(addClass)
+	dropd.selectOption = function(value, classes) {
+		$('.' + dropd.classOption + '[data-value=' + value + ']')
+		.addClass(classes)
 		.css({
 			background: settings.selectedBackground,
 			color: settings.selectedForeground,
 		});
 	};
 
-	dropdown.deselectOption = function(value, removeClass) {
-		$('.dropdown-option[data-value=' + value + ']')
-		.removeClass(removeClass)
+	dropd.deselectOption = function(value, classes) {
+		$('.' + dropd.classOption + '[data-value=' + value + ']')
+		.removeClass(classes)
 		.css({
 			background: settings.background,
 			color: settings.optionsColor,
 		});
 	};
 
-	dropdown.deselectAllOptions = function(removeClass) {
-		$('.dropdown-option')
-		.removeClass(removeClass)
+	dropd.deselectAllOptions = function(classes) {
+		$('.' + dropd.classOption + '')
+		.removeClass(classes)
 		.css({
 			background: settings.background,
 			color: settings.optionsColor,
 		});
 	};
 
-	dropdown.hideList = function() {
-		$('.dropdown-list').addClass('objHide').removeClass('objShow').hide();
+	dropd.hideList = function() {
+		$('.' + dropd.classList).addClass('objHide').removeClass('objShow').hide();
 	};
 
-	dropdown.toggleList = function() {
-		var list = $('.dropdown-list');
+	dropd.toggleList = function() {
+		var list = $('.' + dropd.classList);
 		if(list.hasClass('objHide')) {
 			list.addClass('objShow').removeClass('objHide').show();
 		} else {
-			dropdown.hideList();
+			dropd.hideList();
 		}
 	};
 
@@ -130,11 +127,11 @@
 	 * BUILDER FUNCTIONS:
 	 */
 
-	dropdown.getOption = function(option, parentOption) {
+	dropd.getOption = function(option, parentOption) {
 		var classes = $(option).attr('class') || '',
-			html = $('<p class="dropdown-option focusable" data-value="' + $(option).val() + '" >' + $(option).text() + '</p>')
-				.addClass(classes)
-				.addClass(parentOption ? 'group group-collapsed' : '')
+			html = $('<p class="focusable" data-value="' + $(option).val() + '" >' + $(option).text() + '</p>')
+				.addClass(classes).addClass(dropd.classOption)
+				.addClass(parentOption ? dropd.classGroup + ' ' + dropd.classGroupCollapsed : '')
 				.css({
 					cursor: 'pointer',
 					'margin-top': '2%',
@@ -144,17 +141,18 @@
 		return html[0].outerHTML;
 	};
 
-	dropdown.getGroup = function(index, title, options, classes) {
+	dropd.getGroup = function(index, title, options, classes) {
 		var items = '', group = '';
 		$(options).each(function() {
-			items = items + dropdown.getOption(this, false);
+			items = items + dropd.getOption(this, false);
 		});
 
-		title = '<h3 class="focusable"><span class="dropdown-icon focusable">' + settings.collapsedIcon + '</span> ' + title + '</h3>';
-		items = $('<div><div class="items focusable" data-group="' + index + '">' + items + '</div></div>');
-		group = $('<div><div class="group focusable" data-group="' + index + '">' + title + '</div></div>');
+		title = '<h3 class="focusable"><span class="' + dropd.classIcon + ' focusable">' + settings.collapsedIcon + '</span> ' + title + '</h3>';
+		items = $('<div><div class="focusable" data-group="' + index + '">' + items + '</div></div>');
+		group = $('<div><div class="focusable" data-group="' + index + '">' + title + '</div></div>');
 
 		items.children()
+			.addClass(dropd.classItems)
 			.hide()
 			.css({
 				color: settings.optionsColor,
@@ -163,8 +161,7 @@
 			});
 
 		group.children()
-			.addClass('group-collapsed')
-			.addClass(classes)
+			.addClass(dropd.classGroupCollapsed).addClass(classes).addClass(dropd.classGroup)
 			.css({
 				cursor: 'pointer',
 				color: settings.groupColor,
@@ -174,19 +171,21 @@
 		return '<div>' + group.html() + items.html() + '</div>';
 	};
 
-	dropdown.getSelect = function(old_dropdown) {
+	dropd.getSelect = function(old_dropdown) {
 		var i = 0, html = '';
 
 		$(old_dropdown).children().each(function() {
 			if($(this).is('optgroup')) {
-				html = html + dropdown.getGroup(i++, $(this).attr('label'), $(this).children(), $(this).attr('class'));
+				html = html + dropd.getGroup(i++, $(this).attr('label'), $(this).children(), $(this).attr('class'));
 			} else {
-				html = html + dropdown.getOption($(this), true);
+				html = html + dropd.getOption($(this), true);
 			}
 		});
 
-		var input = $('<input class="dropdown-select focusable" type="text" />');
-		input.css({
+		var input = $('<input class="focusable" type="text" />');
+		input
+		.addClass(dropd.classSelect)
+		.css({
 			width: settings.width,
 			height: settings.height,
 			color: settings.color,
@@ -194,8 +193,10 @@
 			background: settings.background
 		});
 
-		var arrow = $('<span class="dropdown-arrow focusable">' + settings.dropdownIcon + '</span>');
-		arrow.css({
+		var arrow = $('<span class="focusable">' + settings.dropdownIcon + '</span>');
+		arrow
+		.addClass(dropd.classArrow)
+		.css({
 			font: settings.font,
 			color: settings.color,
 			cursor: 'pointer',
@@ -206,8 +207,8 @@
 
 		var select = $('<span>' + input[0].outerHTML + arrow[0].outerHTML + '</span>')[0].outerHTML;
 
-		html = $('<div><span style="position:relative;">' + select + '</span><div class="dropdown-list focusable">' + html + '</div></div>');
-		$('.dropdown-list', html)
+		html = $('<div class="DropD"><span style="position:relative;">' + select + '</span><div class="' + dropd.classList + ' focusable">' + html + '</div></div>');
+		$('.' + dropd.classList, html)
 			.hide()
 			.addClass('objHide')
 			.css({
@@ -226,65 +227,60 @@
 	 * EVENT FUNCTIONS:
 	 */
 
-	dropdown.bindEvents = function() {
-		$(this).on('click', '.group-expanded', dropdown.toggleGroup);
-		$(this).on('click', '.group-collapsed', dropdown.toggleGroup);
+	dropd.bindEvents = function() {
+		$('body').on('click', '.' + dropd.classGroupExpanded, dropd.toggleGroup);
+		$('body').on('click', '.' + dropd.classGroupCollapsed, dropd.toggleGroup);
 
-		$('body').on('click', '.dropdown-select', dropdown.toggleList);
-		$('body').on('click', '.dropdown-arrow', dropdown.toggleList);
+		$('body').on('click', '.' + dropd.classSelect, dropd.toggleList);
+		$('body').on('click', '.' + dropd.classArrow, dropd.toggleList);
 
 		$(document)
 			.keyup(function(e) {
 				if(e.keyCode == keycodes['ESC']) {
-					dropdown.hideList();
+					dropd.hideList();
 				}
 			})
 			.click(function(event) {
 				if(!$(event.target).hasClass('focusable')) {
-					dropdown.hideList();
+					dropd.hideList();
 				}
 			});
 
 		$('body')
-			.on('click', '.dropdown-option', function(e) {
-				var oldValue = String($('.dropdown-select').val().trim());
+			.on('click', '.' + dropd.classOption , function(e) {
+				var oldValue = String($('.' + dropd.classSelect).val().trim());
 
-				dropdown.changeDropdown(this);
-				dropdown.callback(e, settings.onClick, this);
+				dropd.changeDropdown(this);
+				dropd.callback(e, settings.onClick, this);
 
 				var newValue = String($(this).text().trim());
 				if(oldValue.localeCompare(newValue) != 0) {
-					dropdown.callback(e, settings.onChange, this);
+					dropd.callback(e, settings.onChange, this);
 				}
 			});
 
-		$('.dropdown-option')
+		$('.' + dropd.classOption)
 			.mouseenter(function() {
-				dropdown.selectOption($(this).data('value'), 'hovered');
+				dropd.selectOption($(this).data('value'), 'hovered');
 			})
 			.mouseleave(function() {
 				if(!$(this).hasClass('selected')) {
-					dropdown.deselectOption($(this).data('value'), 'hovered');
+					dropd.deselectOption($(this).data('value'), 'hovered');
 				}
 			});
 
 		if(settings.collapseOnHover) {
-			$('.group').mouseenter(function() {
-				dropdown.expandGroup($(this));
-				$('.group[data-group!=' + $(this).data('group') + ']').each(function() {
-					dropdown.collapseGroup($(this));
+			$('.' + dropd.classGroup).mouseenter(function() {
+				dropd.expandGroup($(this));
+				$('.' + dropd.classGroup + '[data-group!=' + $(this).data('group') + ']').each(function() {
+					dropd.collapseGroup($(this));
 				});
 			});
-			// $('.group').mouseleave(function() {
-			// 	$('.group[data-group!=' + $(this).data('group') + ']').each(function() {
-			// 		dropdown.collapseGroup($(this));
-			// 	});
-			// });
 		}
 		
-		var selected = $(':selected', hidden).val().trim();
-		$('.dropdown-option[data-value=' + selected + ']').each(function() {
-			dropdown.changeDropdown(this);
+		var selected = $(':selected', current).val().trim();
+		$('.' + dropd.classOption + '[data-value=' + selected + ']').each(function() {
+			dropd.changeDropdown(this);
 		});
 	};
 
@@ -293,6 +289,12 @@
 	 */
 
 	$.fn.dropd = function(options) {
+		if(!this.length) {
+			// throw "DropD: " + this.selector + " is not a valid select list";
+			console.error("DropD: " + this.selector + " is not a valid select list");
+			return;
+		}
+
 		settings = $.extend({
 			color: '#556bf2',
 			width: '100%',
@@ -304,7 +306,7 @@
 			groupFont: this.css("font"),
 			optionsColor: this.css("color"),
 			optionsFont: this.css("font"),
-			selectedBackground: 'rgb(77, 144, 254)', //'#c0ffff',  //'yellow',
+			selectedBackground: 'rgb(77, 144, 254)',
 			selectedForeground: 'white',
 			dropdownIcon: '&#x25BE;', //'<i class="fa fa-caret-down"></i>',
 			expandedIcon: '&#x25BE;', //'<i class="fa fa-caret-down"></i>',
@@ -314,12 +316,24 @@
 			onChange: undefined,
 		}, options || {});
 
-		hidden = this.clone().hide();
-		$(document).ready(dropdown.bindEvents); // Depends on 'hidden' object...
-		this.parent().append('<div id="dropdown-hidden-select"></div>').append(hidden);
+		dropd.id = this.attr('id');
+		dropd.classPrefix = 'dropd-' + dropd.id + '-';
+		dropd.classGroupExpanded = dropd.classPrefix + 'group-expanded';
+		dropd.classGroupCollapsed = dropd.classPrefix + 'group-collapsed';
+		dropd.classSelect = dropd.classPrefix + 'select';
+		dropd.classOption = dropd.classPrefix + 'option';
+		dropd.classItems = dropd.classPrefix + 'items';
+		dropd.classGroup = dropd.classPrefix + 'group';
+		dropd.classArrow = dropd.classPrefix + 'arrow';
+		dropd.classList = dropd.classPrefix + 'list';
+		dropd.classIcon = dropd.classPrefix + 'icon';
 
-		var html = dropdown.getSelect(this);
-		this.replaceWith(html.html());
+		var select = dropd.getSelect(this),
+			html = select.attr('id', dropd.id);
+		
+		current = this;
+		this.replaceWith(html[0].outerHTML);
+		$(document).ready(dropd.bindEvents);
 
 		return this;
 	};
